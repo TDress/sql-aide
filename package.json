@@ -1,0 +1,27 @@
+{
+  "name": "sql-aide",
+  "version": "0.1.0",
+  "description": "CLI application for scripting repetitive SQL tasks specific to your needs.",
+  "main": "sqade.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TDress/sql-aide.git"
+  },
+  "keywords": [
+    "cli",
+    "node.js",
+    "sql"
+  ],
+  "author": "TDress",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TDress/sql-aide/issues"
+  },
+  "homepage": "https://github.com/TDress/sql-aide#readme",
+  "dependencies": {
+    "commander": "^2.9.0"
+  }
+}

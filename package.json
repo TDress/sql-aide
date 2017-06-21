@@ -22,6 +22,10 @@
   },
   "homepage": "https://github.com/TDress/sql-aide#readme",
   "dependencies": {
-    "commander": "^2.9.0"
+    "commander": "^2.9.0",
+    "colog": "^1.0.4"
+  },
+  "bin": { 
+  	"sqade": "sqade.js"
   }
 }

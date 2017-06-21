@@ -1,5 +1,5 @@
 const fs = require('fs');
-const settings = fs.readFileSync('sqade-settings.json');
+const colog = require('colog');
 /**
  * ADD YOUR CONNECTIONS TO sqade-settings.json 
  * SEE https://github.com/TDress/sql-aide
@@ -46,9 +46,37 @@ const settings = fs.readFileSync('sqade-settings.json');
  *						verifyOnValidate: true
  *					}
  */
+
+// TO DO: create an error utility for these exceptions
+try {
+	const settings = fs.readFileSync('sqade-settings.json');
+} catch (e) {
+	if (e.code === 'ENOENT') { 
+		// TO DO: Add a reminder in the message about copying 
+		// default settings file.
+		colog.error('Unable to read sqade-settings.json file');
+		process.exit();
+	} else { 
+		throw e;
+	}
+}
 const connections = settings.connections;
+// Run configuration settings through some validations.
+// To Do: get errors with line numbers from parsing json 
+if (!connections) { 
+	colog.error(`Unable to parse sqade-settings.json file.  
+		Make sure it is valid json`);
+	process.exit();
+}
+const configMap = new Map(Object.entries(connections));
+// To Do: iterate over config and check that we have
+// everything we need for each connection.  
 
 module.exports = { 
-	configMap: new Map(Object.entries(configuration)),
-
+	configMap,
+	active: connections.activeDB,
+	updateActive: function(name) => { 
+		this.active = name;
+		// TO DO: update the actual settings file
+	}
 }

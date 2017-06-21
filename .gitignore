@@ -57,3 +57,6 @@ typings/
 # dotenv environment variables file
 .env
 
+# sqade connection settings and a custom command configurations
+sqade-settings.json
+commands/custom.json

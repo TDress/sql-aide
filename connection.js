@@ -49,33 +49,38 @@ const colog = require('colog');
 
 // TO DO: create an error utility for these exceptions
 try {
-	const settings = fs.readFileSync('sqade-settings.json');
+	const settingsData = fs.readFileSync('sqade-settings.json');
+	var settings = JSON.parse(settingsData.toString());
 } catch (e) {
 	if (e.code === 'ENOENT') { 
 		// TO DO: Add a reminder in the message about copying 
 		// default settings file.
 		colog.error('Unable to read sqade-settings.json file');
 		process.exit();
+	} else if (e instanceof SyntaxError) { 
+		// To Do: get errors with line numbers from parsing json 
+		colog.error(`Unable to parse sqade-settings.json file.  
+			Make sure it is valid json`);
 	} else { 
 		throw e;
 	}
 }
 const connections = settings.connections;
 // Run configuration settings through some validations.
-// To Do: get errors with line numbers from parsing json 
 if (!connections) { 
-	colog.error(`Unable to parse sqade-settings.json file.  
-		Make sure it is valid json`);
-	process.exit();
+	colog.error(`There is no connections property in your
+		sqade-settings.json file.  This property must
+		be set with your connection configurations.`);
+	process.exit(1);
 }
-const configMap = new Map(Object.entries(connections));
+
 // To Do: iterate over config and check that we have
 // everything we need for each connection.  
-
+const configMap = new Map(Object.entries(connections));
 module.exports = { 
 	configMap,
 	active: connections.activeDB,
-	updateActive: function(name) => { 
+	updateActive: name => { 
 		this.active = name;
 		// TO DO: update the actual settings file
 	}

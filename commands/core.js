@@ -21,7 +21,7 @@ commands[DB_COMMAND] = (app, connection) => {
 			const {switch_db} = options;
 			if (switch_db && connection.configMap.has(switch_db)) { 
 				connection.updateActive(switch_db);
-				colog.success(`Now connected to ${switch_db}.`);
+				colog.success(`Now connected to: ${switch_db}.`);
 				process.exitCode = 0;
 			} else if (switch_db) { 
 				process.exitCode = 1;

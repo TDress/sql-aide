@@ -4,8 +4,7 @@
  * and test for side effects on the commander
  * application object.  
  */
-// const core = require('../commands/core');
-const app = require('commander');
+const {Command} = require('commander');
 const {core, DB_COMMAND} = require('../commands/core');
 
 // mock database names
@@ -66,7 +65,7 @@ module.exports = {
 			updateCount: 0
 		};
 		// commander application.
-		this.app = app;
+		this.app = new Command();
 		callback();
 	},
 	tearDown: function(callback) { 
@@ -119,9 +118,31 @@ module.exports = {
 			'The connection update count is updated to 1.');
 		test.strictEqual(this.connection.active, NAMES[1], 
 			'The active connection name has been updated.');
-		const regex = RegExp(`connected to ${NAMES[1]}`);
+		const regex = RegExp(`connected to: ${NAMES[1]}`);
 		test.ok(regex.test(console.lastSqadeOutput), 
 			'The output to the terminal shows the new active connection.');
+		test.done();
+	},
+	/**
+	 * `db` command -- test without any option.  
+	 */
+	testDBNoOptions: function(test) {
+		test.expect(4);
+		core[DB_COMMAND](this.app, this.connection);
+		test.strictEqual(this.connection.active, NAMES[0], 
+			'The starting active connection is the first test name.');
+
+		toggleLoggingOff();
+		this.app.parse(['node', 'sqade', DB_COMMAND]);
+		toggleLoggingOn();
+		
+		test.strictEqual(this.connection.updateCount, 0,
+			'connection.updateActive() was not called.');
+		test.strictEqual(this.connection.active, NAMES[0], 
+			'The active connection is still the first test name.');
+		const regex = RegExp(`connected to: ${NAMES[0]}`);
+		test.ok(regex.test(console.lastSqadeOutput), 
+			'The output to the terminal shows the active connection.');
 		test.done();
 	}
 }

@@ -103,6 +103,25 @@ module.exports = {
 	 * and the active connection is updated.  
 	 */
 	testDBUpdateActive: function(test) { 
+		test.expect(5)
+		core[DB_COMMAND](this.app, this.connection);
+		test.strictEqual(this.connection.updateCount, 0, 
+			'The connection update count starts at 0.');
+		test.strictEqual(this.connection.active, NAMES[0], 
+			'The starting active connection is the first test name.');
+
+		//  turn off logging and run the command 
+		toggleLoggingOff();
+		this.app.parse(['node', 'sqade', DB_COMMAND, '--switch_db', NAMES[1]]);
+		toggleLoggingOn();
+
+		test.strictEqual(this.connection.updateCount, 1, 
+			'The connection update count is updated to 1.');
+		test.strictEqual(this.connection.active, NAMES[1], 
+			'The active connection name has been updated.');
+		const regex = RegExp(`connected to ${NAMES[1]}`);
+		test.ok(regex.test(console.lastSqadeOutput), 
+			'The output to the terminal shows the new active connection.');
 		test.done();
 	}
 }

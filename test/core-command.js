@@ -6,6 +6,7 @@
  */
 const {Command} = require('commander');
 const {core, DB_COMMAND} = require('../commands/core');
+const {toggleLoggingOff, toggleLoggingOn} = require('../lib/test-util');
 
 // mock database names
 const NAMES = [ 
@@ -18,34 +19,6 @@ let connections = {};
 NAMES.forEach(name => { 
 	connections[name] = {};
 });
-
-/*
- * Set up functions for toggling console logging on 
- * and off for the purposes of testing. 
- * We are not mocking the process object so the command's
- * output will be written to stdout/stderror.
- * Since we don't want this output to mix with the nodeunit 
- * output, we will shut off the logging right before calling 
- * parse() on the commander program, and then toggle logging
- * right back on.
- */
-const oldConsole = { 
-	error: console.error,
-	log: console.log
-};
-const toggleLoggingOff = () => { 
-	Object.keys(oldConsole).forEach(out => { 
-		console[out] = function(message) { 
-			console.lastSqadeOutput = message;
-			// don't send any output to the terminal during tests.
-		}
-	});
-}
-const toggleLoggingOn = () => {
-	Object.keys(oldConsole).forEach(out => { 
-		console[out] = oldConsole[out];
-	});
-};
 
 module.exports = { 
 	setUp: function(callback) { 
@@ -83,7 +56,12 @@ module.exports = {
 			Commander program object.`)
 		test.strictEqual(command.name(), DB_COMMAND,
 			'The correct command name was registered.');
-		//  turn off logging and run the command 
+		/**
+		 * Since we don't want this output to mix with the nodeunit 
+		 * output, we will shut off the logging right before calling 
+		 * parse() on the commander program, and then toggle logging
+		 * right back on.
+		 */
 		toggleLoggingOff();
 		this.app.parse(['node', 'sqade', DB_COMMAND, '--switch_db', NON_OPTION]);
 		toggleLoggingOn();

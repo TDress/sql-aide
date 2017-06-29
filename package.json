@@ -24,7 +24,8 @@
   "dependencies": {
     "colog": "^1.0.4",
     "commander": "^2.9.0",
-    "nodeunit": "^0.11.1"
+    "nodeunit": "^0.11.1",
+    "proxyquire": "^1.8.0"
   },
   "bin": {
     "sqade": "sqade.js"

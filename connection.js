@@ -47,41 +47,52 @@ const colog = require('colog');
  *					}
  */
 
-// TO DO: create an error utility for these exceptions
-try {
-	const settingsData = fs.readFileSync('sqade-settings.json');
-	var settings = JSON.parse(settingsData.toString());
-} catch (e) {
-	if (e.code === 'ENOENT') { 
-		// TO DO: Add a reminder in the message about copying 
-		// default settings file.
-		colog.error('Unable to read sqade-settings.json file');
-		process.exit();
-	} else if (e instanceof SyntaxError) { 
-		// To Do: get errors with line numbers from parsing json 
-		colog.error(`Unable to parse sqade-settings.json file.  
-			Make sure it is valid json`);
-	} else { 
-		throw e;
+const getSettings = () => { 
+	// TO DO: create an error utility for these exceptions
+	try {
+		const settingsData = fs.readFileSync('sqade-settings.json');
+		return settings = JSON.parse(settingsData.toString());
+	} catch (e) {
+		if (e.code === 'ENOENT') { 
+			// TO DO: Add a reminder in the message about copying 
+			// default settings file.
+			colog.error('Unable to read sqade-settings.json file');
+			process.exitCode = 1;
+			return false;
+		} else if (e instanceof SyntaxError) { 
+			// To Do: get errors with line numbers from parsing json 
+			colog.error(`Unable to parse sqade-settings.json file.  
+				Make sure it is valid json`
+			);
+			process.exitCode = 1;
+			return false;
+		} else { 
+			throw e;
+		}
 	}
-}
-const connections = settings.connections;
-// Run configuration settings through some validations.
-if (!connections) { 
-	colog.error(`There is no connections property in your
-		sqade-settings.json file.  This property must
-		be set with your connection configurations.`);
-	process.exit(1);
-}
+};
 
-// To Do: iterate over config and check that we have
-// everything we need for each connection.  
-const configMap = new Map(Object.entries(connections));
-module.exports = { 
-	configMap,
-	active: connections.activeDB,
-	updateActive: name => { 
-		this.active = name;
-		// TO DO: update the actual settings file
+const settings = getSettings();
+if (settings) {
+	const connections = settings.connections;
+	// Run configuration settings through some validations.
+	if (!connections) { 
+		colog.error(`There is no connections property in your
+			sqade-settings.json file.  This property must
+			be set with your connection configurations.`
+		);
+		process.exit(1);
 	}
-}
+
+	// To Do: iterate over config and check that we have
+	// everything we need for each connection.  
+	const configMap = new Map(Object.entries(connections));
+	module.exports = { 
+		configMap,
+		active: connections.activeDB,
+		updateActive: name => { 
+			this.active = name;
+			// TO DO: update the actual settings file
+		}
+	}
+} 

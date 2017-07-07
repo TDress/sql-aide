@@ -53,9 +53,11 @@ module.exports = {
 		core[DB_COMMAND](this.app, this.connection);
 		let command = this.app.commands[0];
 		test.ok(command, `The command was registered to the 
-			Commander program object.`)
+			Commander program object.`
+		);
 		test.strictEqual(command.name(), DB_COMMAND,
-			'The correct command name was registered.');
+			'The correct command name was registered.'
+		);
 		/**
 		 * Since we don't want this output to mix with the nodeunit 
 		 * output, we will shut off the logging right before calling 
@@ -67,12 +69,15 @@ module.exports = {
 		toggleLoggingOn();
 
 		test.ok(/not\s*found/.test(console.lastSqadeOutput), 
-			'`Not found` is printed to the terminal.');
+			'`Not found` is printed to the terminal.'
+		);
 		let options = command.opts();
 		test.ok(options.switch_db && options.switch_db === NON_OPTION, 
-			'The option was passed into the command.');
+			'The option was passed into the command.'
+		);
 		test.strictEqual(this.connection.updateCount, 0,
-			'connection.updateActive() was not called.');
+			'connection.updateActive() was not called.'
+		);
 		test.done();
 	},
 	/**
@@ -83,9 +88,11 @@ module.exports = {
 		test.expect(5)
 		core[DB_COMMAND](this.app, this.connection);
 		test.strictEqual(this.connection.updateCount, 0, 
-			'The connection update count starts at 0.');
+			'The connection update count starts at 0.'
+		);
 		test.strictEqual(this.connection.active, NAMES[0], 
-			'The starting active connection is the first test name.');
+			'The starting active connection is the first test name.'
+		);
 
 		//  turn off logging and run the command 
 		toggleLoggingOff();
@@ -93,12 +100,15 @@ module.exports = {
 		toggleLoggingOn();
 
 		test.strictEqual(this.connection.updateCount, 1, 
-			'The connection update count is updated to 1.');
+			'The connection update count is updated to 1.'
+		);
 		test.strictEqual(this.connection.active, NAMES[1], 
-			'The active connection name has been updated.');
+			'The active connection name has been updated.'
+		);
 		const regex = RegExp(`connected to: ${NAMES[1]}`);
 		test.ok(regex.test(console.lastSqadeOutput), 
-			'The output to the terminal shows the new active connection.');
+			'The output to the terminal shows the new active connection.'
+		);
 		test.done();
 	},
 	/**
@@ -108,19 +118,23 @@ module.exports = {
 		test.expect(4);
 		core[DB_COMMAND](this.app, this.connection);
 		test.strictEqual(this.connection.active, NAMES[0], 
-			'The starting active connection is the first test name.');
+			'The starting active connection is the first test name.'
+		);
 
 		toggleLoggingOff();
 		this.app.parse(['node', 'sqade', DB_COMMAND]);
 		toggleLoggingOn();
 		
 		test.strictEqual(this.connection.updateCount, 0,
-			'connection.updateActive() was not called.');
+			'connection.updateActive() was not called.'
+		);
 		test.strictEqual(this.connection.active, NAMES[0], 
-			'The active connection is still the first test name.');
+			'The active connection is still the first test name.'
+		);
 		const regex = RegExp(`connected to: ${NAMES[0]}`);
 		test.ok(regex.test(console.lastSqadeOutput), 
-			'The output to the terminal shows the active connection.');
+			'The output to the terminal shows the active connection.'
+		);
 		test.done();
 	}
 }

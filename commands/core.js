@@ -27,10 +27,11 @@ commands[DB_COMMAND] = (app, connection) => {
 				process.exitCode = 1;
 				return colog.error(
 					`The connection with name ${switch_db} was not
-					found in sqade-settings.json`);
+					found in sqade-settings.json`
+				);
 			} else { 
 				// no options.  show the current connection name.  
-				colog.success(`Currently connected to: ${active}`)
+				colog.success(`Currently connected to: ${active}`);
 				process.exitCode = 0;
 			}
 		});

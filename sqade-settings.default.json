@@ -1,6 +1,8 @@
 { 
-	"connections": { 
-		
-	},
+	"connections": [ 
+		{ 
+			
+		}
+	],
 	"activeDb": null
 }

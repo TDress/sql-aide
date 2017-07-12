@@ -1,5 +1,6 @@
-const fs = require('fs');
 const colog = require('colog');
+const {parseSettings} = require('./lib/parse');
+const SETTINGS_FILE_NAME = 'sqade-settings.json';
 /**
  * ADD YOUR CONNECTIONS TO sqade-settings.json 
  * SEE https://github.com/TDress/sql-aide
@@ -171,37 +172,7 @@ const validateSettings = (settingsMap) => {
 	return true;
 }
 
-/**
- * Parse settings from file.
- * return object parsed from json.  
- */
-const parseSettings = () => { 
-	// TO DO: create an error utility for these exceptions
-	try {
-		const settingsData = fs.readFileSync('sqade-settings.json');
-		return JSON.parse(settingsData.toString());
-	} catch (e) {
-		if (e.code === 'ENOENT') { 
-			// TO DO: Add a reminder in the message about copying 
-			// default settings file.
-			colog.error('Unable to read sqade-settings.json file');
-			process.exitCode = 1;
-			return false;
-		} else if (e instanceof SyntaxError) { 
-			// To Do: get errors with line numbers from parsing json 
-			colog.error(
-				`Unable to parse sqade-settings.json file.  
-				Make sure it is valid json`
-			);
-			process.exitCode = 1;
-			return false;
-		} else { 
-			throw e;
-		}
-	}
-};
-
-const settings = parseSettings();
+const settings = parseSettings(SETTINGS_FILE_NAME);
 if (settings) {
 	const connections = settings.connections;
 	if (connections) {
@@ -228,3 +199,4 @@ if (settings) {
 	}
 } 
 
+exports.SETTINGS_FILE_NAME = SETTINGS_FILE_NAME;

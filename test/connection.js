@@ -6,10 +6,9 @@ const fsStub = {};
 
 /**
  * stub the node fs core module readFileSync() method
- * to return test data.  We want to test invalid json, 
+ * to return test data.  We want to test 
  * invalid connection configurations, etc.
  */
-const SETTINGS_INVALID_JSON = 'INVALIDJSON';
 const SETTINGS_VALID = `{
 	"connections": { 
 		"test": 
@@ -68,52 +67,11 @@ const SETTINGS_MISSING_CONNECTIONS = `{
 }`;
 
 module.exports = { 
-	testConnectionInvalidJSON: function(test) { 
-		test.expect(2);
-		fsStub.readFileSync = () => SETTINGS_INVALID_JSON;
-		toggleLoggingOff();
-		const connection = proxyquire('../connection', {'fs': fsStub});
-		toggleLoggingOn();
-
-		helpers.undefinedConfigProcessExits(test, connection);
-		test.done();
-	},
-	testConnectionfileSystemError: function(test) { 
-		test.expect(2);
-		fsStub.readFileSync = () => { 
-			// stub a node system error.  (no such file exists).
-			let error = Error();
-			error.code = ENOENT;
-			throw error;
-		}
-		toggleLoggingOff();
-		const connection = proxyquire('../connection', {'fs': fsStub});
-		toggleLoggingOn();
-
-		helpers.undefinedConfigProcessExits(test, connection);
-		test.done();
-	},
-	testConnectionErrorOther: function(test) { 
-		test.expect(1);
-		fsStub.readFileSync = () => { 
-			// stub unhandled system exception
-			let error = Error();
-			throw error;
-		}
-		const requireBlock = () => { 
-			const connection = proxyquire('../connection', {'fs': fsStub});
-		}
-		test.throws(
-			requireBlock,
-			Error,
-			'Unhandled file system exception should be thrown.'
-		);
-		test.done();
-	},
 	testConnectionValid: function(test) { 
 		test.expect(3);
 		fsStub.readFileSync = () => SETTINGS_VALID;
-		const connection = proxyquire('../connection', {'fs': fsStub});
+    proxyquire('../lib/parse', {'fs': fsStub});
+		const connection = proxyquire('../connection', {});
 		
 		const config = connection.config;
 		test.ok(
@@ -137,7 +95,8 @@ module.exports = {
 		test.expect(2);
 		fsStub.readFileSync = () => SETTINGS_MISSING_CONNECTIONS;
 		toggleLoggingOff();
-		const connection = proxyquire('../connection', {'fs': fsStub});
+    proxyquire('../lib/parse', {'fs': fsStub});
+		const connection = proxyquire('../connection', {});
 		toggleLoggingOn();
 		
 		helpers.undefinedConfigProcessExits(test, connection);
@@ -147,17 +106,17 @@ module.exports = {
 		test.expect(3);
 		fsStub.readFileSync = () => SETTINGS_MISSING_TYPE;
 		toggleLoggingOff();
-		const connection = proxyquire('../connection', {'fs': fsStub});
+    proxyquire('../lib/parse', {'fs': fsStub});
+		const connection = proxyquire('../connection', {});
 		toggleLoggingOn();	
 
 		helpers.invalidConnectionSettingsProcessExits(test, connection);
 		test.done();
 	}
+};
 
-}
-
+// Helper methods for common assertions.
 const helpers = { 
-	// Helper methods for common assertions.
 	undefinedConfigProcessExits(test, connection) { 
 		const config = connection.config;
 		test.ok(

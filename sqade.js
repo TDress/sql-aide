@@ -16,7 +16,7 @@ const {core} = require('./commands/core');
 // selecting a command name from configuration and returning a function
 // to register the command.  this will also have to validate 
 // the custom configuration.  
-const custom = {};
+const custom = require('./custom');
 const commandName = process.argv[2];
 if (config.isValid) {
 	if (!commandName) { 

@@ -2,9 +2,6 @@ const colog = require('colog');
 
 // command names
 const DB_COMMAND = 'db';
-Object.assign(exports, { 
-	DB_COMMAND
-});
 /**
  * Core commands for sqade.
  * Each property is the name of a command and its value
@@ -37,6 +34,8 @@ commands[DB_COMMAND] = (app, connection) => {
 		});
 };
 
-exports.core = commands;
-
+module.exports = { 
+  DB_COMMAND, 
+  commands
+};
 

@@ -5,20 +5,15 @@
  * application object.  
  */
 const {Command} = require('commander');
-const {core, DB_COMMAND} = require('../commands/core');
+const {commands, DB_COMMAND} = require('../commands/core');
 const {toggleLoggingOff, toggleLoggingOn} = require('../lib/test-util');
+const {
+  SETTINGS_VALID,
+  SETTINGS_VALID_NAMES,
+  NON_OPTION
+} = require('./fixtures/config-validator');
 
-// mock database names
-const NAMES = [ 
-	'test1', 'test2', 'test3'
-];
-// option name to use for testing a nonexistent option value.
-const NON_OPTION = 'NON-OPTION';
-// mock connection configuration (sqade-settings.json)
-let connections = {};
-NAMES.forEach(name => { 
-	connections[name] = {};
-});
+const connections = JSON.parse(SETTINGS_VALID).connections;
 
 module.exports = { 
 	setUp: function(callback) { 
@@ -30,7 +25,7 @@ module.exports = {
 		const configMap = new Map(Object.entries(connections));
 		this.connection = { 
 			configMap, 
-			active: NAMES[0], 
+			active: SETTINGS_VALID_NAMES[0], 
 			updateActive: function(name) { 
 				this.active = name;
 				this.updateCount++;
@@ -50,12 +45,15 @@ module.exports = {
 	 */ 
 	testDBCommandBadOption: function(test) { 
 		test.expect(5);
-		core[DB_COMMAND](this.app, this.connection);
+		commands[DB_COMMAND](this.app, this.connection);
 		let command = this.app.commands[0];
-		test.ok(command, `The command was registered to the 
-			Commander program object.`
+		test.ok(
+      command, 
+      `The command was registered to the commander program object.`
 		);
-		test.strictEqual(command.name(), DB_COMMAND,
+		test.strictEqual(
+      command.name(), 
+      DB_COMMAND,
 			'The correct command name was registered.'
 		);
 		/**
@@ -68,14 +66,18 @@ module.exports = {
 		this.app.parse(['node', 'sqade', DB_COMMAND, '--switch_db', NON_OPTION]);
 		toggleLoggingOn();
 
-		test.ok(/not\s*found/.test(console.lastSqadeOutput), 
+		test.ok(
+      /not\s*found/.test(console.lastSqadeOutput), 
 			'`Not found` is printed to the terminal.'
 		);
 		let options = command.opts();
-		test.ok(options.switch_db && options.switch_db === NON_OPTION, 
+		test.ok(
+      options.switch_db && options.switch_db === NON_OPTION, 
 			'The option was passed into the command.'
 		);
-		test.strictEqual(this.connection.updateCount, 0,
+		test.strictEqual(
+      this.connection.updateCount, 
+      0,
 			'connection.updateActive() was not called.'
 		);
 		test.done();
@@ -86,26 +88,26 @@ module.exports = {
 	 */
 	testDBUpdateActive: function(test) { 
 		test.expect(5)
-		core[DB_COMMAND](this.app, this.connection);
+		commands[DB_COMMAND](this.app, this.connection);
 		test.strictEqual(this.connection.updateCount, 0, 
 			'The connection update count starts at 0.'
 		);
-		test.strictEqual(this.connection.active, NAMES[0], 
+		test.strictEqual(this.connection.active, SETTINGS_VALID_NAMES[0], 
 			'The starting active connection is the first test name.'
 		);
 
 		//  turn off logging and run the command 
 		toggleLoggingOff();
-		this.app.parse(['node', 'sqade', DB_COMMAND, '--switch_db', NAMES[1]]);
+		this.app.parse(['node', 'sqade', DB_COMMAND, '--switch_db', SETTINGS_VALID_NAMES[1]]);
 		toggleLoggingOn();
 
 		test.strictEqual(this.connection.updateCount, 1, 
 			'The connection update count is updated to 1.'
 		);
-		test.strictEqual(this.connection.active, NAMES[1], 
+		test.strictEqual(this.connection.active, SETTINGS_VALID_NAMES[1], 
 			'The active connection name has been updated.'
 		);
-		const regex = RegExp(`connected to: ${NAMES[1]}`);
+		const regex = RegExp(`connected to: ${SETTINGS_VALID_NAMES[1]}`);
 		test.ok(regex.test(console.lastSqadeOutput), 
 			'The output to the terminal shows the new active connection.'
 		);
@@ -116,8 +118,8 @@ module.exports = {
 	 */
 	testDBNoOptions: function(test) {
 		test.expect(4);
-		core[DB_COMMAND](this.app, this.connection);
-		test.strictEqual(this.connection.active, NAMES[0], 
+		commands[DB_COMMAND](this.app, this.connection);
+		test.strictEqual(this.connection.active, SETTINGS_VALID_NAMES[0], 
 			'The starting active connection is the first test name.'
 		);
 
@@ -128,10 +130,10 @@ module.exports = {
 		test.strictEqual(this.connection.updateCount, 0,
 			'connection.updateActive() was not called.'
 		);
-		test.strictEqual(this.connection.active, NAMES[0], 
+		test.strictEqual(this.connection.active, SETTINGS_VALID_NAMES[0], 
 			'The active connection is still the first test name.'
 		);
-		const regex = RegExp(`connected to: ${NAMES[0]}`);
+		const regex = RegExp(`connected to: ${SETTINGS_VALID_NAMES[0]}`);
 		test.ok(regex.test(console.lastSqadeOutput), 
 			'The output to the terminal shows the active connection.'
 		);

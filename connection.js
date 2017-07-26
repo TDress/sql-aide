@@ -1,6 +1,8 @@
 const colog = require('colog');
-const {parseSettings} = require('./lib/parse');
+const {parseSettingsFile} = require('./lib/config-parser');
+const {validateConnectionsConfig} = require('./lib/config-validator');
 const SETTINGS_FILE_NAME = 'sqade-settings.json';
+
 /**
  * ADD YOUR CONNECTIONS TO sqade-settings.json 
  * SEE https://github.com/TDress/sql-aide
@@ -48,155 +50,22 @@ const SETTINGS_FILE_NAME = 'sqade-settings.json';
  *					}
  */
 
-// Valid SQL source types.
-const SOURCE_TYPES = [ 
-	'mssql',
-	'mysql'
-];
+const settings = parseSettingsFile(SETTINGS_FILE_NAME);
+const configMap = settings && settings.connections
+  ? new Map(Object.entries(settings.connections)) 
+  : null;
+const isValid = validateConnectionsConfig(configMap);
+const active = settings
+  && settings.connections 
+  && settings.connections.activeDB;
 
-// generalized leading text for all validation errors.  
-const VALIDATION_ERROR_MESSAGE = `Error: Invalid connection settings
-	in sqade-settings.json.  `;
-
-// utility function for connection settings validation
-const notEmpty = (val) => val && val.length;
-/**
- * connection setting keys that require validation
- * and functions for performing validation.  
- * More robust validations can be added later
- * but for now we will just check that the setting
- * has a non-empty value.
- */
-const CONNECTION_KEYS = { 
-	type(type, name) { 
-		if (SOURCE_TYPES.indexOf(type) === -1) { 
-			colog.error(
-				VALIDATION_ERROR_MESSAGE
-				+ 'Connection type setting must be one of the following: \n'
-				+ SOURCE_TYPES.reduce((carry, val) => carry + val + '\n', '')
-				+ '\n' + `On connection ${name}`
-			);
-			return false;
-		}
-		return true;
-	}, 
-	host(host, name) { 
-		if (!notEmpty(host)) { 
-			colog.error( 
-				VALIDATION_ERROR_MESSAGE
-				+ `Connection host setting must not be empty on connection ${name}.` 
-			);
-			return false;
-		}
-		return true;
-	},
-	port(port, name) { 
-		if (!Number.isInteger(port) || port < 1) {
-			colog.error( 
-				VALIDATION_ERROR_MESSAGE
-				+ `Connection port setting must be a positive 
-					integer on connection ${name}.`
-			);
-			return false;
-		}
-		return true;
-	},
-	database(database, name) { 
-		if (!notEmpty(database)) { 
-			colog.error( 
-				VALIDATION_ERROR_MESSAGE
-				+ `Connection database setting must not be empty on connection ${name}.`
-			);
-			return false;
-		}
-		return true;
-	},
-	login(login, name) { 
-		if (!notEmpty(login)) { 
-			colog.error( 
-				VALIDATION_ERROR_MESSAGE
-				+ `Connection login setting must not be empty on connection ${name}.`
-			);
-			return false;
-		}
-		return true;
-	},
-	password(password, name) { 
-		if (!notEmpty(password)) { 
-			colog.error( 
-				VALIDATION_ERROR_MESSAGE
-				+ `Connection host setting must not be empty on connection ${name}.`
-			);
-			return false;
-		}
-		return true;
-	}
-};
-
-/**
- * Validate each settings object, checking all required
- * keys.  
- * @param {Map} settingsMap the settings json parsed from sqade-settings.json
- * @return boolean validation is succeful.
- * 		On validation failure, the process exits gracefully and we return false,
- * 		after an error message is printed to the user.
- */
-const validateSettings = (settingsMap) => { 
-	const connections = settingsMap.entries();
-	let entry = connections.next();
-	while (!entry.done) {
-		let connectionName = entry.value[0];
-		let connectionValues = entry.value[1];
-		// The connection name is not empty.
-		if (connectionName.length < 1) { 
-			colog.error(
-				VALIDATION_ERROR_MESSAGE
-				+ `Connections must have a non-empty name key.`
-			);
-			process.exitCode = 1;
-			return false;
-		}
-		let isValid = Object.keys(CONNECTION_KEYS).reduce((carry, current) => {
-			return carry 
-				&& CONNECTION_KEYS[current](connectionValues[current], connectionName);
-		}, true);
-
-		if (!isValid) { 
-			process.exitCode = 1;
-			return false;
-		}
-
-		entry = connections.next();
-	}
-
-	return true;
+module.exports = { 
+  configMap,
+  isValid,
+  active,
+  updateActive: name => { 
+    this.active = name;
+    // TO DO: update the actual settings file
+  },
+  SETTINGS_FILE_NAME
 }
-
-const settings = parseSettings(SETTINGS_FILE_NAME);
-if (settings) {
-	const connections = settings.connections;
-	if (connections) {
-		// To Do: iterate over config and check that we have
-		// everything we need for each connection.  
-		const configMap = new Map(Object.entries(connections));
-		const isValid = validateSettings(configMap);
-		exports.config = { 
-			configMap,
-			isValid,
-			active: connections.activeDB,
-			updateActive: name => { 
-				this.active = name;
-				// TO DO: update the actual settings file
-			}
-		}
-	} else {
-		colog.error(
-			`There is no connections property in your
-			sqade-settings.json file.  This property must
-			be set with your connection configurations.`
-		);
-		process.exitCode = 1;
-	}
-} 
-
-exports.SETTINGS_FILE_NAME = SETTINGS_FILE_NAME;

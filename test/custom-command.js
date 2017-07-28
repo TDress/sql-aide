@@ -24,7 +24,7 @@ module.exports = {
     callback();
   },
   testValidCommandOneArgument: function(test) { 
-    test.expect(6);
+    test.expect(7);
 		fsStub.readFileSync = () => COMMAND_ONE_ARGUMENT;
     const config = JSON.parse(COMMAND_ONE_ARGUMENT);
     proxyquire('../lib/config-parser', {'fs': fsStub});
@@ -38,7 +38,7 @@ module.exports = {
     test.done();
   },
   testValidCommandTwoArguments: function(test) { 
-    test.expect(6);
+    test.expect(7);
 		fsStub.readFileSync = () => COMMAND_TWO_ARGUMENTS;
     const config = JSON.parse(COMMAND_TWO_ARGUMENTS);
     proxyquire('../lib/config-parser', {'fs': fsStub});
@@ -52,7 +52,7 @@ module.exports = {
     test.done();   
   },
   testValidCommandThreeArguments: function(test) { 
-    test.expect(6);
+    test.expect(7);
 		fsStub.readFileSync = () => COMMAND_THREE_ARGUMENTS;
     const config = JSON.parse(COMMAND_THREE_ARGUMENTS);
     proxyquire('../lib/config-parser', {'fs': fsStub});
@@ -66,7 +66,7 @@ module.exports = {
     test.done();     
   },
   testValidMultipleCommands: function(test) { 
-    test.expect(12);
+    test.expect(15);
 		fsStub.readFileSync = () => COMMAND_MULTIPLE;
     const config = JSON.parse(COMMAND_MULTIPLE);
     proxyquire('../lib/config-parser', {'fs': fsStub});
@@ -170,6 +170,9 @@ const helperTestCustomModuleValid = (test, custom, config) => {
  */
 const helperTestValidCommand = (test, command, config) => { 
     const commandName = command.name();
+    const expectedArgs = config[commandName].args;
+    const expectedDescription = config[commandName].description;
+
 		test.ok(
       command, 
       `The command was registered to the commander program object.`
@@ -181,7 +184,12 @@ const helperTestValidCommand = (test, command, config) => {
 		);
 		test.strictEqual(
       command.description(), 
-      config[commandName].description,
+      expectedDescription,
 			'The correct command description was registered.'
 		);
+    test.strictEqual( 
+      command._args.map(arg => arg.name).join(','),
+      expectedArgs, 
+      'The correct arguments were registered.'
+    );
 }

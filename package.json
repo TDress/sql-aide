@@ -24,6 +24,7 @@
   "dependencies": {
     "colog": "^1.0.4",
     "commander": "^2.9.0",
+    "mssql": "^4.0.4",
     "nodeunit": "^0.11.1",
     "proxyquire": "^1.8.0"
   },

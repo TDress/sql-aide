@@ -38,7 +38,8 @@ const SETTINGS_VALID = `{
 				"verifyOnValidate": false		
 			}
 	},
-	"activeDb": "test2"
+	"activeDb": "test2",
+  "activeDBResourceString": "mssql://user:pass@test.host.com:100/test2"
 }`;
 const SETTINGS_VALID_NAMES = ['test', 'test2'];
 

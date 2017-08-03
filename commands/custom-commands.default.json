@@ -1,0 +1,6 @@
+{ 
+  "example-command-name": {
+    "sql": "select example from examples where example_id={:example_id}",
+    "description": "Example description"
+  }
+}

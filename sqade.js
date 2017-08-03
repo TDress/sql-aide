@@ -4,27 +4,27 @@
 const colog = require('colog');
 const app = require('commander');
 
+const core = require('./commands/core');
 /**
- * Import the connection module.
- * This import implicitly validates the connection 
- * configuration and throws an exception if there is
- * an error.
+ * Loading the connection and custom modules parses the 
+ * settings files and implicitly validates settings and configuration.
+ * `isValid` properties store the result of the validations.
  */
-const {config} = require('./connection');
-const {core} = require('./commands/core');
-// TO DO: custom object should have its own method of
-// selecting a command name from configuration and returning a function
-// to register the command.  this will also have to validate 
-// the custom configuration.  
+const connection = require('./connection');
 const custom = require('./custom');
+/**
+ * Commander normally handles parsing of argv, 
+ * but we want to configure the commander object at runtime..
+ */
 const commandName = process.argv[2];
-if (config.isValid) {
+
+if (connection.isValid && custom.isValid) {
 	if (!commandName) { 
 		// TO DO: show description and list of commands
-	} else if (core.hasOwnProperty(commandName)) { 
-		core[commandName](app, config);
-	} else if (custom.hasOwnProperty(commandName)) { 
-		custom[commandName](app, config);
+	} else if (core.commands.hasOwnProperty(commandName)) { 
+		core.commands[commandName](app, connection);
+	} else if (custom.commands.hasOwnProperty(commandName)) { 
+		custom.commands[commandName](app, connection);
 	} else { 
 		colog.error(`${commandName} is not a valid command name`);
 	}

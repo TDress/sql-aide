@@ -59,4 +59,4 @@ typings/
 
 # sqade connection settings and a custom command configurations
 sqade-settings.json
-commands/custom.json
+commands/custom-commands.json

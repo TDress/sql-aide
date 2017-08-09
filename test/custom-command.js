@@ -1,6 +1,6 @@
 const {Command} = require('commander');
 const {toggleLoggingOff, toggleLoggingOn} = require('../lib/test-util');
-const proxyquire = require('proxyquire');
+const proxyquire = require('proxyquire').noPreserveCache();
 const { 
   COMMAND_MISSING_NAME,
   COMMAND_MISSING_SQL,
@@ -27,6 +27,7 @@ module.exports = {
     test.expect(7);
 		fsStub.readFileSync = () => COMMAND_ONE_ARGUMENT;
     const config = JSON.parse(COMMAND_ONE_ARGUMENT);
+    proxyquire.preserveCache();
     proxyquire('../lib/config-parser', {'fs': fsStub});
 		const custom = proxyquire('../commands/custom', {});
     helperTestCustomModuleValid(test, custom, config);
@@ -35,12 +36,14 @@ module.exports = {
     const command = this.app.commands[0];
     helperTestValidCommand(test, command, config);
 
+    proxyquire.noPreserveCache();
     test.done();
   },
   testValidCommandTwoArguments: function(test) { 
     test.expect(7);
 		fsStub.readFileSync = () => COMMAND_TWO_ARGUMENTS;
     const config = JSON.parse(COMMAND_TWO_ARGUMENTS);
+    proxyquire.preserveCache();
     proxyquire('../lib/config-parser', {'fs': fsStub});
 		const custom = proxyquire('../commands/custom', {});
     helperTestCustomModuleValid(test, custom, config);
@@ -49,12 +52,14 @@ module.exports = {
     const command = this.app.commands[0];
     helperTestValidCommand(test, command, config);
 
+    proxyquire.noPreserveCache();
     test.done();   
   },
   testValidCommandThreeArguments: function(test) { 
     test.expect(7);
 		fsStub.readFileSync = () => COMMAND_THREE_ARGUMENTS;
     const config = JSON.parse(COMMAND_THREE_ARGUMENTS);
+    proxyquire.preserveCache();
     proxyquire('../lib/config-parser', {'fs': fsStub});
 		const custom = proxyquire('../commands/custom', {});
     helperTestCustomModuleValid(test, custom, config);
@@ -63,12 +68,14 @@ module.exports = {
     const command = this.app.commands[0];
     helperTestValidCommand(test, command, config);
 
+    proxyquire.noPreserveCache();
     test.done();     
   },
   testValidMultipleCommands: function(test) { 
     test.expect(15);
 		fsStub.readFileSync = () => COMMAND_MULTIPLE;
     const config = JSON.parse(COMMAND_MULTIPLE);
+    proxyquire.preserveCache();
     proxyquire('../lib/config-parser', {'fs': fsStub});
 		const custom = proxyquire('../commands/custom', {});
     helperTestCustomModuleValid(test, custom, config);
@@ -79,6 +86,7 @@ module.exports = {
       helperTestValidCommand(test, command, config);
     });
 
+    proxyquire.noPreserveCache();
     test.done();        
   },
   testInvalidCommand: function(test) { 

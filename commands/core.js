@@ -1,4 +1,4 @@
-const colog = require('colog');
+const colog = require('../lib/colog-noindent');
 
 // command names
 const DB_COMMAND = 'db';

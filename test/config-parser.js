@@ -1,7 +1,7 @@
 const {
 	toggleLoggingOff, toggleLoggingOn, ENOENT
 } = require('../lib/test-util');
-const proxyquire = require('proxyquire');
+const proxyquire = require('proxyquire').noPreserveCache();
 const {SETTINGS_FILE_NAME} = require('./connection');
 // stub for node fs module
 const fsStub = {}; 

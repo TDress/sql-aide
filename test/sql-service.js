@@ -1,4 +1,4 @@
-const proxyquire = require('proxyquire');
+const proxyquire = require('proxyquire').noPreserveCache();
 const {SETTINGS_VALID} = require('./fixtures/config-validator');
 
 const connectionSettings = JSON.parse(SETTINGS_VALID);

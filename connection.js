@@ -1,4 +1,4 @@
-const colog = require('colog');
+const colog = require('./lib/colog-noindent');
 const {parseSettingsFile} = require('./lib/config-parser');
 const {validateConnectionsConfig} = require('./lib/config-validator');
 const SETTINGS_FILE_NAME = 'sqade-settings.json';

@@ -1,7 +1,7 @@
 #!/usr/bin/env node 
 'use strict';
 
-const colog = require('colog');
+const colog = require('./lib/colog-noindent');
 const app = require('commander');
 
 const core = require('./commands/core');
@@ -11,7 +11,7 @@ const core = require('./commands/core');
  * `isValid` properties store the result of the validations.
  */
 const connection = require('./connection');
-const custom = require('./custom');
+const custom = require('./commands/custom');
 /**
  * Commander normally handles parsing of argv, 
  * but we want to configure the commander object at runtime..

@@ -1,4 +1,4 @@
-const colog = require('colog');
+const colog = require('../lib/colog-noindent');
 const SQLService = require('../lib/sql-service');
 const {
   parseSettingsFile, 
@@ -31,11 +31,11 @@ const registerCommand = (name, commandConfig) => {
     return `${car}<${arg}> `;
   }, '');
   return function(app, connection) { 
-    const service = new SQLService(connection);
     app
       .command(`${name} ${argsCommander}`)
       .description(description)
       .action((...params) => { 
+        const service = new SQLService(connection);
         const queryStr = insertSQLArgs(args, sql);
         const result = service.query(queryStr);
         if (!result) { 

@@ -44,7 +44,7 @@ module.exports = {
 	 * (The database name does not exist in the connections.)
 	 */ 
 	testDBCommandBadOption: function(test) { 
-		test.expect(5);
+		test.expect(4);
 		commands[DB_COMMAND](this.app, this.connection);
 		let command = this.app.commands[0];
 		test.ok(
@@ -66,10 +66,6 @@ module.exports = {
 		this.app.parse(['node', 'sqade', DB_COMMAND, '--switch_db', NON_OPTION]);
 		toggleLoggingOn();
 
-		test.ok(
-      /not\s*found/.test(console.lastSqadeOutput), 
-			'`Not found` is printed to the terminal.'
-		);
 		let options = command.opts();
 		test.ok(
       options.switch_db && options.switch_db === NON_OPTION, 
@@ -87,7 +83,7 @@ module.exports = {
 	 * and the active connection is updated.  
 	 */
 	testDBUpdateActive: function(test) { 
-		test.expect(5)
+		test.expect(4)
 		commands[DB_COMMAND](this.app, this.connection);
 		test.strictEqual(this.connection.updateCount, 0, 
 			'The connection update count starts at 0.'
@@ -107,17 +103,13 @@ module.exports = {
 		test.strictEqual(this.connection.active, SETTINGS_VALID_NAMES[1], 
 			'The active connection name has been updated.'
 		);
-		const regex = RegExp(`connected to: ${SETTINGS_VALID_NAMES[1]}`);
-		test.ok(regex.test(console.lastSqadeOutput), 
-			'The output to the terminal shows the new active connection.'
-		);
 		test.done();
 	},
 	/**
 	 * `db` command -- test without any option.  
 	 */
 	testDBNoOptions: function(test) {
-		test.expect(4);
+		test.expect(3);
 		commands[DB_COMMAND](this.app, this.connection);
 		test.strictEqual(this.connection.active, SETTINGS_VALID_NAMES[0], 
 			'The starting active connection is the first test name.'
@@ -132,10 +124,6 @@ module.exports = {
 		);
 		test.strictEqual(this.connection.active, SETTINGS_VALID_NAMES[0], 
 			'The active connection is still the first test name.'
-		);
-		const regex = RegExp(`connected to: ${SETTINGS_VALID_NAMES[0]}`);
-		test.ok(regex.test(console.lastSqadeOutput), 
-			'The output to the terminal shows the active connection.'
 		);
 		test.done();
 	}

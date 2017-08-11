@@ -27,57 +27,50 @@ module.exports = {
     test.expect(7);
 		fsStub.readFileSync = () => COMMAND_ONE_ARGUMENT;
     const config = JSON.parse(COMMAND_ONE_ARGUMENT);
-    proxyquire.preserveCache();
-    proxyquire('../lib/config-parser', {'fs': fsStub});
-		const custom = proxyquire('../commands/custom', {});
+    const ConfigParser = proxyquire('../lib/config-parser', {'fs': fsStub});
+		const custom = proxyquire('../commands/custom', {'../lib/config-parser': ConfigParser});
     helperTestCustomModuleValid(test, custom, config);
 
     custom.commands[Object.keys(config)[0]](this.app, {});
     const command = this.app.commands[0];
     helperTestValidCommand(test, command, config);
 
-    proxyquire.noPreserveCache();
     test.done();
   },
   testValidCommandTwoArguments: function(test) { 
     test.expect(7);
 		fsStub.readFileSync = () => COMMAND_TWO_ARGUMENTS;
     const config = JSON.parse(COMMAND_TWO_ARGUMENTS);
-    proxyquire.preserveCache();
-    proxyquire('../lib/config-parser', {'fs': fsStub});
-		const custom = proxyquire('../commands/custom', {});
+    const ConfigParser = proxyquire('../lib/config-parser', {'fs': fsStub});
+		const custom = proxyquire('../commands/custom', {'../lib/config-parser': ConfigParser});
     helperTestCustomModuleValid(test, custom, config);
 
     custom.commands[Object.keys(config)[0]](this.app, {});
     const command = this.app.commands[0];
     helperTestValidCommand(test, command, config);
 
-    proxyquire.noPreserveCache();
     test.done();   
   },
   testValidCommandThreeArguments: function(test) { 
     test.expect(7);
 		fsStub.readFileSync = () => COMMAND_THREE_ARGUMENTS;
     const config = JSON.parse(COMMAND_THREE_ARGUMENTS);
-    proxyquire.preserveCache();
-    proxyquire('../lib/config-parser', {'fs': fsStub});
-		const custom = proxyquire('../commands/custom', {});
+    const ConfigParser = proxyquire('../lib/config-parser', {'fs': fsStub});
+		const custom = proxyquire('../commands/custom', {'../lib/config-parser': ConfigParser});
     helperTestCustomModuleValid(test, custom, config);
 
     custom.commands[Object.keys(config)[0]](this.app, {});
     const command = this.app.commands[0];
     helperTestValidCommand(test, command, config);
 
-    proxyquire.noPreserveCache();
     test.done();     
   },
   testValidMultipleCommands: function(test) { 
     test.expect(15);
 		fsStub.readFileSync = () => COMMAND_MULTIPLE;
     const config = JSON.parse(COMMAND_MULTIPLE);
-    proxyquire.preserveCache();
-    proxyquire('../lib/config-parser', {'fs': fsStub});
-		const custom = proxyquire('../commands/custom', {});
+    const ConfigParser = proxyquire('../lib/config-parser', {'fs': fsStub});
+		const custom = proxyquire('../commands/custom', {'../lib/config-parser': ConfigParser});
     helperTestCustomModuleValid(test, custom, config);
 
     Object.keys(custom.commands).forEach((name, i) => { 
@@ -86,16 +79,15 @@ module.exports = {
       helperTestValidCommand(test, command, config);
     });
 
-    proxyquire.noPreserveCache();
     test.done();        
   },
   testInvalidCommand: function(test) { 
     test.expect(4);
 		fsStub.readFileSync = () => COMMAND_MISSING_NAME;
     let config = JSON.parse(COMMAND_MISSING_NAME);
-    proxyquire('../lib/config-parser', {'fs': fsStub});
+    let ConfigParser = proxyquire('../lib/config-parser', {'fs': fsStub});
     toggleLoggingOff();
-		let custom = proxyquire('../commands/custom', {});
+		let custom = proxyquire('../commands/custom', {'../lib/config-parser': ConfigParser});
     toggleLoggingOn();
     
     test.ok( 
@@ -111,9 +103,9 @@ module.exports = {
 
 		fsStub.readFileSync = () => COMMAND_MISSING_SQL;
     config = JSON.parse(COMMAND_MISSING_SQL);
-    proxyquire('../lib/config-parser', {'fs': fsStub});
+    ConfigParser = proxyquire('../lib/config-parser', {'fs': fsStub});
     toggleLoggingOff();
-		custom = proxyquire('../commands/custom', {});
+		custom = proxyquire('../commands/custom', {'../lib/config-parser': ConfigParser});
     toggleLoggingOn();
     
     test.ok( 

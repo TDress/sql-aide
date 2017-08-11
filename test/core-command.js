@@ -45,7 +45,7 @@ module.exports = {
 	 */ 
 	testDBCommandBadOption: function(test) { 
 		test.expect(4);
-		commands[DB_COMMAND](this.app, this.connection);
+		commands[DB_COMMAND[0]](this.app, this.connection);
 		let command = this.app.commands[0];
 		test.ok(
       command, 
@@ -53,7 +53,7 @@ module.exports = {
 		);
 		test.strictEqual(
       command.name(), 
-      DB_COMMAND,
+      DB_COMMAND[0],
 			'The correct command name was registered.'
 		);
 		/**
@@ -63,7 +63,7 @@ module.exports = {
 		 * right back on.
 		 */
 		toggleLoggingOff();
-		this.app.parse(['node', 'sqade', DB_COMMAND, '--switch_db', NON_OPTION]);
+		this.app.parse(['node', 'sqade', DB_COMMAND[0], '--switch_db', NON_OPTION]);
 		toggleLoggingOn();
 
 		let options = command.opts();
@@ -84,7 +84,7 @@ module.exports = {
 	 */
 	testDBUpdateActive: function(test) { 
 		test.expect(4)
-		commands[DB_COMMAND](this.app, this.connection);
+		commands[DB_COMMAND[0]](this.app, this.connection);
 		test.strictEqual(this.connection.updateCount, 0, 
 			'The connection update count starts at 0.'
 		);
@@ -94,7 +94,7 @@ module.exports = {
 
 		//  turn off logging and run the command 
 		toggleLoggingOff();
-		this.app.parse(['node', 'sqade', DB_COMMAND, '--switch_db', SETTINGS_VALID_NAMES[1]]);
+		this.app.parse(['node', 'sqade', DB_COMMAND[0], '--switch_db', SETTINGS_VALID_NAMES[1]]);
 		toggleLoggingOn();
 
 		test.strictEqual(this.connection.updateCount, 1, 
@@ -110,13 +110,13 @@ module.exports = {
 	 */
 	testDBNoOptions: function(test) {
 		test.expect(3);
-		commands[DB_COMMAND](this.app, this.connection);
+		commands[DB_COMMAND[0]](this.app, this.connection);
 		test.strictEqual(this.connection.active, SETTINGS_VALID_NAMES[0], 
 			'The starting active connection is the first test name.'
 		);
 
 		toggleLoggingOff();
-		this.app.parse(['node', 'sqade', DB_COMMAND]);
+		this.app.parse(['node', 'sqade', DB_COMMAND[0]]);
 		toggleLoggingOn();
 		
 		test.strictEqual(this.connection.updateCount, 0,

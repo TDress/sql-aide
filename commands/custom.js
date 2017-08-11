@@ -7,10 +7,18 @@ const {
 } = require('../lib/config-parser');
 const {validateCommand} = require('../lib/config-validator');
 
-const SETTINGS_FILE_NAME = 'custom-commands.json';
+const SETTINGS_FILE_NAME = 'commands/custom-commands.json';
 
 // commands to be exported
 const commands = {};
+/**
+ * command descriptions for display.  
+ * it is possible to inspect the commander application commands
+ * inside the commands object, but only if the command has 
+ * already been registered.  Instead we will explicitly define
+ * the description when we register the command.
+ */
+const commandDescriptions = {};
 
 /**
  * Return a function to be used for the command.  
@@ -25,6 +33,7 @@ const commands = {};
  */
 const registerCommand = (name, commandConfig) => { 
   const {sql, description} = commandConfig;
+  commandDescriptions[name] = description;
   // parse out arguments for the command from the sql string
   const args = parseArgNames(sql);
   const argsCommander = args.reduce((car, arg) => { 
@@ -69,5 +78,6 @@ if (isValid) {
 module.exports = { 
   isValid,
   commands, 
+  commandDescriptions,
   SETTINGS_FILE_NAME
 };

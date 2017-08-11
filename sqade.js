@@ -3,6 +3,7 @@
 
 const colog = require('./lib/colog-noindent');
 const app = require('commander');
+const {getCommandDescriptions} = require('./lib/config-formatter');
 
 const core = require('./commands/core');
 /**
@@ -21,6 +22,10 @@ const commandName = process.argv[2];
 if (connection.isValid && custom.isValid) {
 	if (!commandName) { 
 		// TO DO: show description and list of commands
+    colog.headerSuccess('sql CLI tool!');
+    colog.headerAnswer('Available Commands:');
+    colog.answer(getCommandDescriptions(core.commandDescriptions));
+    colog.answer(getCommandDescriptions(custom.commandDescriptions));
 	} else if (core.commands.hasOwnProperty(commandName)) { 
 		core.commands[commandName](app, connection);
 	} else if (custom.commands.hasOwnProperty(commandName)) { 

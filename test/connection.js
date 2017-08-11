@@ -11,8 +11,8 @@ module.exports = {
 	testConnectionValid: function(test) { 
 		test.expect(4);
 		fsStub.readFileSync = () => SETTINGS_VALID;
-    proxyquire('../lib/config-parser', {'fs': fsStub});
-		const connection = proxyquire('../connection', {});
+    const ConfigParser = proxyquire('../lib/config-parser', {'fs': fsStub});
+		const connection = proxyquire('../connection', {'./lib/config-parser': ConfigParser});
 		test.ok(
 			connection.configMap, 
 			'Connection configuration map should be truthy.'
@@ -32,7 +32,7 @@ module.exports = {
 
     test.strictEqual( 
       connection.active,
-      SETTINGS_VALID.activeDB,
+      testSettings.get('activeDb'),
       'The active DB is parsed correctly from the settings file.'
     );
 		test.done();	

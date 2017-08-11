@@ -54,10 +54,11 @@ const settings = parseSettingsFile(SETTINGS_FILE_NAME);
 const configMap = settings && settings.connections
   ? new Map(Object.entries(settings.connections)) 
   : null;
+
 const isValid = validateConnectionsConfig(configMap);
+
 const active = settings
-  && settings.connections 
-  && settings.connections.activeDB;
+  && settings.activeDb; 
 
 module.exports = { 
   configMap,

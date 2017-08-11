@@ -1,18 +1,20 @@
 const colog = require('../lib/colog-noindent');
 
-// command names
-const DB_COMMAND = 'db';
+// command names as [name, description] pairs.  
+const DB_COMMAND = ['db', 'manage your DB connections'];
 /**
  * Core commands for sqade.
  * Each property is the name of a command and its value
  * is a function that registers the command configuration.
  */
 let commands = {};
-commands[DB_COMMAND] = (app, connection) => { 
+let commandDescriptions = {};
+
+commands[DB_COMMAND[0]] = (app, connection) => { 
 	const active = connection.active;
 	app
 		.command('db')
-		.description('manage your DB connections')
+		.description(DB_COMMAND[1])
 		.option('-s, --switch_db <dbname>', 'switch to connection with name provided')
 		.action((options) => { 
 			const {switch_db} = options;
@@ -34,8 +36,11 @@ commands[DB_COMMAND] = (app, connection) => {
 		});
 };
 
+commandDescriptions[DB_COMMAND[0]] = DB_COMMAND[1];
+
 module.exports = { 
   DB_COMMAND, 
+  commandDescriptions,
   commands
 };
 

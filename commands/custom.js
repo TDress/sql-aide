@@ -11,6 +11,7 @@ const SETTINGS_FILE_NAME = 'commands/custom-commands.json';
 
 // commands to be exported
 const commands = {};
+
 /**
  * command descriptions for display.  
  * it is possible to inspect the commander application commands

@@ -32,7 +32,7 @@ const SETTINGS_VALID = `{
 				"type": "mysql",
 				"host": "test.host.com",
 				"port": 100,
-				"database": "test",
+				"database": "test2",
 				"login": "user",
 				"password": "pass",
 				"verifyOnValidate": false		

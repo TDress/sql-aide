@@ -8,7 +8,8 @@ const connection = {
     Object.entries(connectionSettings.connections)
   ),
   isValid: true, 
-  active: connectionSettings.activeDb
+  active: connectionSettings.activeDb,
+  activeDBResourceString: connectionSettings.activeDBResourceString
 }
 // stub for mssql library
 let mssqlStub = {

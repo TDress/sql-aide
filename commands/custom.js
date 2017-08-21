@@ -44,13 +44,13 @@ const registerCommand = (name, commandConfig) => {
     app
       .command(`${name} ${argsCommander}`)
       .description(description)
-      .action((...params) => { 
+      .action(async (...params) => { 
         const service = new SQLService(connection);
         const queryStr = insertSQLArgs(args, sql);
-        const result = service.query(queryStr);
+        const result = await service.query(queryStr);
         if (!result) { 
           colog.error(`Error.  Message from database server: 
-            ${service.error}`);
+              ${service.error}`);
           process.exitCode = 1;
         } else { 
           colog.success(result);

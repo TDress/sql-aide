@@ -28,11 +28,13 @@ if (connection.isValid && custom.isValid) {
     colog.answer(getCommandDescriptions(custom.commandDescriptions));
 	} else if (core.commands.hasOwnProperty(commandName)) { 
 		core.commands[commandName](app, connection);
+    app.parse(process.argv);
 	} else if (custom.commands.hasOwnProperty(commandName)) { 
-		custom.commands[commandName](app, connection);
+    (async () => { 
+      custom.commands[commandName](app, connection);
+      return await app.parse(process.argv);
+    })();
 	} else { 
 		colog.error(`${commandName} is not a valid command name`);
 	}
-
-	app.parse(process.argv);
 }

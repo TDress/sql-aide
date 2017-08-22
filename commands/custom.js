@@ -28,26 +28,49 @@ const commandDescriptions = {};
  *
  * @param {String} name The command name.
  * @param {Object} commandConfig Configuration for the command.
- *    Includes properties: `sql`, `description`
  * @return {Function} A function to be called when configuring 
  *    commander with the new command.
  */
 const registerCommand = (name, commandConfig) => { 
-  const {sql, description} = commandConfig;
+  const {
+    sql, 
+    description,
+    isProcedure,
+    procedureName,
+    procedureArgs
+  } = commandConfig;
+  // Add command description for display.
   commandDescriptions[name] = description;
-  // parse out arguments for the command from the sql string
-  const args = parseArgNames(sql);
+
+  // argument names
+  let args = [];
+  if (!sql || isProcedure) { 
+    args = procedureArgs;
+  } else { 
+    // parse out arguments for the command from the sql string
+    args = parseArgNames(sql);
+  }
   const argsCommander = args.reduce((car, arg) => { 
     return `${car}<${arg}> `;
   }, '');
+
   return function(app, connection) { 
     app
       .command(`${name} ${argsCommander}`)
       .description(description)
       .action(async (...params) => { 
+        let result;
         const service = new SQLService(connection);
-        const queryStr = insertSQLArgs(args, sql);
-        const result = await service.query(queryStr);
+        if (!sql || isProcedure) { 
+          let inputs = {};
+          for(let i = 0; i < params.length; i++) { 
+            inputs[args[i]] = params[i];
+          }
+          result = await service.storedProcQuery(procedureName, inputs);
+        } else { 
+          const queryStr = insertSQLArgs(params, sql);
+          result = await service.query(queryStr);
+        }
         if (!result) { 
           colog.error(`Error.  Message from database server: 
               ${service.error}`);

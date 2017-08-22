@@ -109,7 +109,7 @@ exports.validateCommand = {
     );
     test.ok(
       !validateCommand(VALID_NAME, testConfig),
-      'Empty string config sql value causes failure.'
+      'Empty string config sql value causes failure if not a stored procedure.'
     );
 
     toggleLoggingOn();

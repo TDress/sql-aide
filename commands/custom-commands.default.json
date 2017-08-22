@@ -2,5 +2,14 @@
   "example-command-name": {
     "sql": "select example from examples where example_id={:example_id}",
     "description": "Example description"
+  },
+  "example-stored-procedure": { 
+    "isProcedure": true,
+    "procedureName": "example_name", 
+    "procedureArgs": [ 
+      "example_arg1",  
+      "example_arg2" 
+    ],
+    "description": "Example stored procedure description"
   }
 }

@@ -9,6 +9,32 @@ const VALID_CONFIG = {
   sql: 'select "{:one} then {:two} then {:three}"',
   description: 'this command is a test'
 };
+const VALID_CONFIG_SP = { 
+    "isProcedure": true,
+    "procedureName": "example-name", 
+    "commandArgs": [ 
+      "example_arg1",  
+      "example_arg2",
+      "example_arg3"
+    ],
+    "procedureArgs": [ 
+      "example_arg1",
+      "example-field-name"
+    ],
+    "argPipeMap": [ 
+      {
+        "pipeToArg": "example-field-name",
+        "pipeFromParams": [ 
+          "example_arg2", 
+          "example_arg3"
+        ],
+        "pipeFromCommandName": "example-command-name",
+        "isResultSet": false,
+        "resultField": "example-field-name"
+      }
+    ],
+    "description": "Example stored procedure description"
+};
 const VALID_NAME = 'test';
 
 /*
@@ -80,6 +106,7 @@ const NON_OPTION = 'NON-OPTION';
 
 module.exports = { 
   VALID_CONFIG,
+  VALID_CONFIG_SP,
   VALID_NAME,
   SETTINGS_MISSING_CONNECTIONS,
   SETTINGS_MISSING_NAME,

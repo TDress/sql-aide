@@ -22,6 +22,85 @@ const commands = {};
 const commandDescriptions = {};
 
 /**
+ * Return a function to be used for the command, piping any 
+ * arguments which we need to retrieve from the results of other commands.  
+ * NOTE: currently only stored procedure commands are supported for piping
+ *
+ * Parse arguments and description from the command settings
+ * and set up the commander object.
+ *
+ * @param {String} name The command name.
+ * @param {Object} commandConfig Configuration for the command.
+ * @return {Function} A function to be called when configuring 
+ *    commander with the new command.
+ */
+const registerCommandPiped = (name, commandConfig) => { 
+  const {
+    description,
+    isProcedure,
+    procedureName,
+    commandArgs,
+    procedureArgs,
+    argPipeMap
+  } = commandConfig;
+  // Add command description for display.
+  commandDescriptions[name] = description;
+
+  const argsCommander = commandArgs.reduce((car, arg) => { 
+    return `${car}<${arg}> `;
+  }, '');
+
+  return function(app, connection) { 
+    app
+      .command(`${name} ${argsCommander}`)
+      .description(description)
+      .action(async (...params) => { 
+        let result;
+        const service = new SQLService(connection);
+        let commandInputs, procedureInputs = {};
+        // Get command argument names and values.  
+        for(let i = 0; i < params.length; i++) { 
+          commandInputs[commandArgs[i]] = params[i];
+        }
+        // Fill in any procedure arguments that are also command arguments.
+        commandArgs.forEach(name => { 
+          if (procedureArgs.indexOf(name) >= 0) { 
+            procedureInputs[name] = commandInputs[name];
+          }
+        });
+
+        /**
+         * Get remaining procedure inputs by executing commands that will 
+         * retrieve vaules we need to pipe into those inputs.
+         */
+        for(let obj of argPipeMap) { 
+          let result;
+          let pipeInputs = obj.pipeFromParams.reduce((car, name) => { 
+            car[name] = commandInputs[name];
+          }, {});
+          let pipeProcedureName = config[obj.procedureName]['procedureName'];
+
+          result = await service.storedProcQuery(pipeProcedureName, pipeInputs);
+          console.log(result);
+          procedureInputs[obj.pipeToArg] = result[obj.resultField];
+        }
+
+        // Here we execute our final target procedure after all inputs are prepared.
+        result = await service.storedProcQuery(procedureName, procedureInputs);
+
+        if (!result) { 
+          colog.error(`Error.  Message from database server: 
+              ${service.error}`);
+          process.exitCode = 1;
+        } else { 
+          colog.success(result);
+          return result;
+        }
+      });
+  };
+};
+
+/**
  * Return a function to be used for the command.  
  * Parse arguments and description from the command settings
  * and set up the commander object.
@@ -45,7 +124,7 @@ const registerCommand = (name, commandConfig) => {
   // argument names
   let args = [];
   if (!sql || isProcedure) { 
-    args = procedureArgs;
+    args = procedureArgs || commandArgs;
   } else { 
     // parse out arguments for the command from the sql string
     args = parseArgNames(sql);
@@ -77,6 +156,7 @@ const registerCommand = (name, commandConfig) => {
           process.exitCode = 1;
         } else { 
           colog.success(result);
+          return result;
         }
       });
   };
@@ -95,7 +175,11 @@ const isValid = commandEntries && commandEntries.reduce((carry, entry) => {
 
 if (isValid) { 
   commandEntries.forEach(entry => { 
-    commands[entry[0]] = registerCommand(entry[0], entry[1]);
+    if (entry[1].argPipeMap && entry[1].argPipeMap.length > 0) { 
+      commands[entry[0]] = registerCommandPiped(entry[0], entry[1]);
+    } else { 
+      commands[entry[0]] = registerCommand(entry[0], entry[1]);
+    }
   });
 }
 

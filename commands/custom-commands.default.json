@@ -5,10 +5,27 @@
   },
   "example-stored-procedure": { 
     "isProcedure": true,
-    "procedureName": "example_name", 
-    "procedureArgs": [ 
+    "procedureName": "example-name", 
+    "commandArgs": [ 
       "example_arg1",  
-      "example_arg2" 
+      "example_arg2",
+      "example_arg3"
+    ],
+    "procedureArgs": [ 
+      "example_arg1",
+      "example-field-name"
+    ],
+    "argPipeMap": [ 
+      {
+        "pipeToArg": "example-field-name",
+        "pipeFromParams": [ 
+          "example_arg2", 
+          "example_arg3"
+        ],
+        "pipeFromCommandName": "example-command-name",
+        "isResultSet": false,
+        "resultField": "example-field-name"
+      }
     ],
     "description": "Example stored procedure description"
   }

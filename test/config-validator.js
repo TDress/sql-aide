@@ -8,6 +8,7 @@ const {
 // fixture data for command and connection configuration
 const { 
   VALID_CONFIG,
+  VALID_CONFIG_SP,
   VALID_NAME,
   SETTINGS_VALID,
   SETTINGS_MISSING_TYPE,
@@ -149,7 +150,7 @@ exports.validateCommand = {
     test.done();      
   },
   testValidConfig: function(test) { 
-    test.expect(4);
+    test.expect(5);
     toggleLoggingOff();
     test.ok( 
       validateCommand(VALID_NAME, VALID_CONFIG), 
@@ -173,11 +174,63 @@ exports.validateCommand = {
       validateCommand(VALID_NAME, testConfig),
       'Valid config with zero args is valid.'
     );
+    // stored procedure config
+    test.ok( 
+      validateCommand(VALID_NAME, VALID_CONFIG_SP), 
+      'Valid stored procedure configuration validates successfully.'
+    );
 
     test.notStrictEqual(
       process.exitCode,
       1,
       `Valid config should not result in 
+        process exiting with error.`
+    );
+
+    toggleLoggingOn();
+    test.done();
+  },
+  testStoredProcedureCommandInvalid: function(test) { 
+    test.expect(3);
+    toggleLoggingOff();
+    let testConfig = Object.assign( 
+      {}, 
+      VALID_CONFIG_SP,
+      { 
+        "commandArgs": [
+          "example_arg1",  
+          "example_arg2"
+        ]
+      }
+    );
+    test.ok( 
+      !validateCommand(VALID_NAME, testConfig),
+      `If a command argument is required to get a result
+        and pipe it into a procedure argument, validation will
+        fail if the command argument doesn't exist.`
+    );
+
+    testConfig = Object.assign( 
+      {}, 
+      VALID_CONFIG_SP,
+      { 
+        "procedureArgs": [ 
+          "example_arg1",
+          "example-field-name",
+          "orphan-argument"
+        ]
+      }
+    );
+    test.ok( 
+      !validateCommand(VALID_NAME, testConfig),
+      `Procedure arguments must have a matching command argument
+        or a matching result field piped in.`
+    );
+
+    test.strictEqual(
+      process.exitCode,
+      1,
+      `InValid config should result in 
         process exiting with error.`
     );
 

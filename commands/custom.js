@@ -57,9 +57,9 @@ const registerCommandPiped = (name, commandConfig) => {
       .action(async (...params) => { 
         let result;
         const service = new SQLService(connection);
-        let commandInputs, procedureInputs = {};
+        let commandInputs = {}, procedureInputs = {};
         // Get command argument names and values.  
-        for(let i = 0; i < params.length; i++) { 
+        for(let i = 0; i < commandArgs.length; i++) { 
           commandInputs[commandArgs[i]] = params[i];
         }
         // Fill in any procedure arguments that are also command arguments.
@@ -77,17 +77,26 @@ const registerCommandPiped = (name, commandConfig) => {
           let result;
           let pipeInputs = obj.pipeFromParams.reduce((car, name) => { 
             car[name] = commandInputs[name];
+            return car;
           }, {});
-
+          colog.question(`Procedure: ${obj.pipeFromProcedureName}`);
+          colog.question(`Params: ${JSON.stringify(pipeInputs)}`);
           result = await service.storedProcQuery(
             obj.pipeFromProcedureName, 
             pipeInputs
           );
-          console.log(result);
-          procedureInputs[obj.pipeToArg] = result[obj.resultField];
+          colog.answer(result);
+
+          // extract the field from the record or record set
+          let fieldValue = obj.isResultSet
+            ? result.recordset[0][obj.resultField] 
+            : result.record[obj.resultField];
+          procedureInputs[obj.pipeToArg] = fieldValue;
         }
 
         // Here we execute our final target procedure after all inputs are prepared.
+        colog.question(
+          `Procedure: ${procedureName}   Params: ${JSON.stringify(procedureInputs)}`);
         result = await service.storedProcQuery(procedureName, procedureInputs);
 
         if (!result) { 

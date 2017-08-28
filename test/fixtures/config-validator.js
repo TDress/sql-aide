@@ -28,7 +28,7 @@ const VALID_CONFIG_SP = {
           "example_arg2", 
           "example_arg3"
         ],
-        "pipeFromCommandName": "example-command-name",
+        "pipeFromProcedureName": "example-procedure-name",
         "isResultSet": false,
         "resultField": "example-field-name"
       }

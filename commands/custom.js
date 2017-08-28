@@ -78,9 +78,11 @@ const registerCommandPiped = (name, commandConfig) => {
           let pipeInputs = obj.pipeFromParams.reduce((car, name) => { 
             car[name] = commandInputs[name];
           }, {});
-          let pipeProcedureName = config[obj.procedureName]['procedureName'];
 
-          result = await service.storedProcQuery(pipeProcedureName, pipeInputs);
+          result = await service.storedProcQuery(
+            obj.pipeFromProcedureName, 
+            pipeInputs
+          );
           console.log(result);
           procedureInputs[obj.pipeToArg] = result[obj.resultField];
         }

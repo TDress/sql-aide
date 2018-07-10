@@ -20,21 +20,21 @@ const custom = require('./commands/custom');
 const commandName = process.argv[2];
 
 if (connection.isValid && custom.isValid) {
-	if (!commandName) { 
-		// TO DO: show description and list of commands
+  if (!commandName) { 
+    // TO DO: show description and list of commands
     colog.headerSuccess('sql CLI tool!');
     colog.headerAnswer('Available Commands:');
     colog.answer(getCommandDescriptions(core.commandDescriptions));
     colog.answer(getCommandDescriptions(custom.commandDescriptions));
-	} else if (core.commands.hasOwnProperty(commandName)) { 
-		core.commands[commandName](app, connection);
+  } else if (core.commands.hasOwnProperty(commandName)) { 
+    core.commands[commandName](app, connection);
     app.parse(process.argv);
-	} else if (custom.commands.hasOwnProperty(commandName)) { 
+  } else if (custom.commands.hasOwnProperty(commandName)) { 
     (async () => { 
       custom.commands[commandName](app, connection);
       return await app.parse(process.argv);
     })();
-	} else { 
-		colog.error(`${commandName} is not a valid command name`);
-	}
+  } else { 
+    colog.error(`${commandName} is not a valid command name`);
+  }
 }
